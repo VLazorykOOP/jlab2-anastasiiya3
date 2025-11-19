@@ -1,0 +1,96 @@
+import static java.lang.Math.sqrt;
+
+/**
+ * Клас Prism (Призма), який описує прямокутну призму.
+ * Основа призми — правильний трикутник.
+ */
+public class Prism {
+
+    // Поля класу (Атрибути)
+    private double side;    // Сторона правильного трикутника в основі
+    private double height;  // Висота призми
+
+    /**
+     * Конструктор для ініціалізації об'єкта Prism.
+     *
+     * @param side Довжина сторони основи (правильного трикутника).
+     * @param height Висота призми.
+     */
+    public Prism(double side, double height) {
+        if (side <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Сторона і висота мають бути додатними числами.");
+        }
+        this.side = side;
+        this.height = height;
+    }
+
+    // --- Допоміжні методи для обчислень ---
+
+    /**
+     * Обчислює периметр основи (правильного трикутника).
+     * P = 3 * a
+     *
+     * @return Периметр основи.
+     */
+    private double calculateBasePerimeter() {
+        return 3 * side;
+    }
+
+    /**
+     * Обчислює площу основи (правильного трикутника).
+     * S_base = (a^2 * sqrt(3)) / 4
+     *
+     * @return Площа основи.
+     */
+    private double calculateBaseArea() {
+        // Площа правильного трикутника: (сторона^2 * √3) / 4
+        return (side * side * sqrt(3)) / 4.0;
+    }
+
+    // --- Основні методи класу ---
+
+    /**
+     * Обчислює площу бічної поверхні призми.
+     * S_lateral = P_base * h
+     *
+     * @return Площа бічної поверхні.
+     */
+    public double calculateLateralArea() {
+        // Площа бічної поверхні = Периметр основи * Висота призми
+        double perimeter = calculateBasePerimeter();
+        return perimeter * height;
+    }
+
+    /**
+     * Обчислює об'єм призми.
+     * V = S_base * h
+     *
+     * @return Об'єм призми.
+     */
+    public double calculateVolume() {
+        // Об'єм = Площа основи * Висота призми
+        double baseArea = calculateBaseArea();
+        return baseArea * height;
+    }
+
+    // --- Демонстраційний метод (Головна програма) ---
+    public static void main(String[] args) {
+        // Приклад використання: сторона основи = 5.0, висота призми = 10.0
+        Prism myPrism = new Prism(5.0, 10.0);
+
+        // Обчислення та виведення результатів
+        double lateralArea = myPrism.calculateLateralArea();
+        double volume = myPrism.calculateVolume();
+        
+        System.out.println("--- Розрахунок параметрів призми ---");
+        System.out.println("Сторона основи (a): " + myPrism.side);
+        System.out.println("Висота призми (h): " + myPrism.height);
+        System.out.println("------------------------------------");
+        System.out.println("Площа бічної поверхні (S_біч.): " + String.format("%.2f", lateralArea));
+        System.out.println("Об'єм призми (V):                " + String.format("%.2f", volume));
+        System.out.println("------------------------------------");
+    }
+
+    // Можна додати геттери/сеттери, якщо потрібно
+    // ...
+}

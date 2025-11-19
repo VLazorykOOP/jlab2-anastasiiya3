@@ -1,0 +1,142 @@
+import java.time.Year;
+import java.util.Locale; // Додано для коректного форматування чисел з плаваючою комою
+
+/**
+ * Клас для демонстрації роботи класу Payment. 
+ * Цей клас має містити метод main, якщо ви зберігаєте все в одному файлі.
+ */
+public class PaymentDemo {
+    public static void main(String[] args) {
+        // Встановлюємо локаль, щоб гарантувати виведення точок як роздільників дробів
+        // замість коми, що є більш звичним для програмування.
+        // Це опціонально, але корисно для читабельності виводу.
+        Locale.setDefault(Locale.US);
+        
+        System.out.println("--- Запуск розрахунку зарплати ---");
+
+        // Створення об'єкта Payment для працівника Іваненка
+        Payment ivanenko = new Payment(
+            "Іваненко",    // Прізвище
+            "Петро",       // Ім'я
+            15000.00,      // Оклад
+            2020,          // Рік поступлення на роботу
+            15.0,          // Відсоток надбавки (15%)
+            19.5,          // Податкова ставка (18% ПДФО + 1.5% ВЗ = 19.5%)
+            20,            // Кількість відпрацьованих днів
+            22             // Загальна кількість робочих днів у місяці
+        );
+
+        // Виведення результатів
+        ivanenko.displayPaymentDetails();
+
+        System.out.println("\n--- Додаткова перевірка ---");
+        System.out.println("Стаж: " + ivanenko.calculateWorkExperience() + " років.");
+    }
+}
+
+// --- ВИПРАВЛЕНИЙ КЛАС PAYMENT ---
+
+/**
+ * Клас, що представляє облік заробітної плати. 
+ * ЗВЕРНІТЬ УВАГУ: Модифікатор 'public' видалено, щоб уникнути помилки.
+ */
+class Payment { 
+
+    // Поля класу (Атрибути)
+    private String surname;         // прізвище
+    private String name;            // ім'я
+    private double salary;          // оклад (місячна ставка без надбавок)
+    private int startYear;          // рік поступлення на роботу
+    private double bonusPercentage; // відсоток надбавки (наприклад, 15.0 для 15%)
+    private double taxRate;         // податок (наприклад, 19.5 для 19.5%)
+    private int workedDays;         // кількість відпрацьованих днів у місяці
+    private int totalDaysInMonth;   // кількість днів у місяці (загальна)
+
+    // Поля для зберігання результатів
+    private double accruedAmount;   // нарахована сума
+    private double withheldAmount;  // утримана сума
+
+    /**
+     * Конструктор для ініціалізації об'єкта Payment.
+     */
+    public Payment(String surname, String name, double salary, int startYear,
+                   double bonusPercentage, double taxRate, int workedDays, int totalDaysInMonth) {
+        this.surname = surname;
+        this.name = name;
+        this.salary = salary;
+        this.startYear = startYear;
+        this.bonusPercentage = bonusPercentage;
+        this.taxRate = taxRate;
+        this.workedDays = workedDays;
+        this.totalDaysInMonth = totalDaysInMonth;
+        this.accruedAmount = 0.0;
+        this.withheldAmount = 0.0;
+    }
+
+    // --- Методи-обчислювачі ---
+
+    /**
+     * Обчислює нараховану суму.
+     */
+    public double calculateAccruedAmount() {
+        // Розрахунок окладу пропорційно відпрацьованим дням
+        double proportionalBase = (salary / totalDaysInMonth) * workedDays;
+
+        // Додавання надбавки
+        double bonusMultiplier = 1 + (bonusPercentage / 100.0);
+        accruedAmount = proportionalBase * bonusMultiplier;
+
+        return accruedAmount;
+    }
+
+    /**
+     * Обчислює утриману суму (податок).
+     */
+    public double calculateWithheldAmount() {
+        // Обов'язково обчислюємо нараховану суму перед розрахунком утримань
+        if (accruedAmount == 0.0) {
+            calculateAccruedAmount();
+        }
+
+        // Розрахунок податку
+        double taxMultiplier = taxRate / 100.0;
+        withheldAmount = accruedAmount * taxMultiplier;
+
+        return withheldAmount;
+    }
+
+    /**
+     * Обчислює стаж роботи в повних роках.
+     */
+    public int calculateWorkExperience() {
+        int currentYear = Year.now().getValue();
+        return currentYear - startYear;
+    }
+
+    // --- Метод для виведення результатів ---
+
+    /**
+     * Виводить інформацію про працівника та обчислені суми.
+     */
+    public void displayPaymentDetails() {
+        // Обчислення всіх сум
+        double acc = calculateAccruedAmount();
+        double with = calculateWithheldAmount();
+        int experience = calculateWorkExperience();
+        double netSalary = acc - with; // Чиста зарплата (на руки)
+
+        System.out.println("\n--- Розрахунковий лист ---");
+        System.out.println("Працівник: " + surname + " " + name);
+        System.out.println("Оклад (ставка): " + String.format("%.2f", salary) + " грн");
+        System.out.println("Відсоток надбавки: " + String.format("%.2f", bonusPercentage) + "%");
+        System.out.println("Податкова ставка: " + String.format("%.2f", taxRate) + "%");
+        System.out.println("Стаж роботи: " + experience + " років");
+        System.out.println("Відпрацьовано днів: " + workedDays + " з " + totalDaysInMonth);
+        System.out.println("--------------------------");
+        System.out.println("Нарахована сума:   " + String.format("%.2f", acc) + " грн");
+        System.out.println("Утримана сума (податок): " + String.format("%.2f", with) + " грн");
+        System.out.println("--------------------------");
+        System.out.println("**Чиста зарплата:** " + String.format("%.2f", netSalary) + " грн");
+        System.out.println("--------------------------");
+    }
+}
